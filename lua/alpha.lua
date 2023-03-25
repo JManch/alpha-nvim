@@ -17,7 +17,7 @@ local cursor_jumps_press_queue = {}
 -- map of buffer -> state
 local alpha_state = {}
 local function head(t)
-    local next,_,_ = pairs(t)
+    local next, _, _ = pairs(t)
     return t[next(t)]
 end
 
@@ -51,14 +51,13 @@ function alpha.queue_press(state)
     if cursor_jumps_press_queue[cursor_ix] then
         cursor_jumps_press_queue[cursor_ix] = nil
     else
-
         local cursor = vim.api.nvim_win_get_cursor(state.window)
         local row = cursor[1]
         local col = cursor[2]
 
-        cursor_jumps_press_queue[cursor_ix] = {row,col}
+        cursor_jumps_press_queue[cursor_ix] = { row, col }
 
-        draw_press(row,col,state)
+        draw_press(row, col, state)
         local height = state.line
         vim.api.nvim_win_set_cursor(0, { math.min(row + 1, height), col })
     end
@@ -156,7 +155,7 @@ function alpha.highlight(state, end_ln, hl, left, el)
         end
         if hl[1] and hl[1][1] and type(hl[1][1]) == "table" then
             for ix, hl_line in ipairs(hl) do
-                single_line(hl_line, ix-1)
+                single_line(hl_line, ix - 1)
             end
         else
             single_line(hl, 0)
@@ -188,11 +187,11 @@ function layout_element.text(el, conf, state)
     end
     local hl = {}
     local padding = { left = 0 }
-    local margin = vim.tbl_get(conf, 'opts', 'margin')
-    local position = vim.tbl_get(el, 'opts', 'position')
+    local margin = vim.tbl_get(conf, "opts", "margin")
+    local position = vim.tbl_get(el, "opts", "position")
     if margin and (position ~= "center") then
         local left
-        val, left = alpha.pad_margin(val, state, margin, if_nil(vim.tbl_get(el, 'opts', 'shrink_margin'), true))
+        val, left = alpha.pad_margin(val, state, margin, if_nil(vim.tbl_get(el, "opts", "shrink_margin"), true))
         padding.left = padding.left + left
     end
     if position == "center" then
@@ -200,7 +199,7 @@ function layout_element.text(el, conf, state)
         val, left = alpha.align_center(val, state)
         padding.left = padding.left + left
     end
-    local el_hl = vim.tbl_get(el, 'opts', 'hl')
+    local el_hl = vim.tbl_get(el, "opts", "hl")
     if type(el.val) == "string" then
         if el_hl then
             hl = alpha.highlight(state, state.line, el_hl, padding.left, el)
@@ -214,7 +213,6 @@ function layout_element.text(el, conf, state)
         state.line = end_ln
     end
     return val, hl
-
 end
 
 ---@diagnostic disable-next-line: unused-local
@@ -243,9 +241,9 @@ function layout_element.button(el, conf, state)
         center = 0,
         right = 0,
     }
-    local opts = vim.tbl_get(el, 'opts')
-    local shortcut = vim.tbl_get(opts, 'shortcut')
-    local width = vim.tbl_get(opts, 'width')
+    local opts = vim.tbl_get(el, "opts")
+    local shortcut = vim.tbl_get(opts, "shortcut")
+    local width = vim.tbl_get(opts, "width")
     if shortcut then
         -- this min lets the padding resize when the window gets smaller
         if width then
@@ -267,7 +265,7 @@ function layout_element.button(el, conf, state)
     end
 
     -- margin
-    if vim.tbl_get(conf, 'opts', 'margin') and (vim.tbl_get(opts, 'position') ~= "center") then
+    if vim.tbl_get(conf, "opts", "margin") and (vim.tbl_get(opts, "position") ~= "center") then
         local left
         val, left = alpha.pad_margin(val, state, conf.opts.margin, if_nil(el.opts.shrink_margin, true))
         if el.opts.align_shortcut == "right" then
@@ -278,7 +276,7 @@ function layout_element.button(el, conf, state)
     end
 
     -- center
-    if vim.tbl_get(el, 'opts', 'position') == "center" then
+    if vim.tbl_get(el, "opts", "position") == "center" then
         local left
         val, left = alpha.align_center(val, state)
         if el.opts.align_shortcut == "right" then
@@ -299,7 +297,7 @@ function layout_element.button(el, conf, state)
             hl = el.opts.hl_shortcut
         end
         if el.opts.align_shortcut == "right" then
-            hl = alpha.highlight(state, state.line, hl, #el.val + math.max(0,padding.center), el)
+            hl = alpha.highlight(state, state.line, hl, #el.val + math.max(0, padding.center), el)
         else
             hl = alpha.highlight(state, state.line, hl, padding.left, el)
         end
@@ -324,12 +322,12 @@ function layout_element.group(el, conf, state)
     if type(el.val) == "table" then
         local text_tbl = {}
         local hl_tbl = {}
-        local priority = if_nil(vim.tbl_get(el, 'opts', 'priority'), 1)
-        local inherit = vim.tbl_get(el, 'opts', 'inherit')
+        local priority = if_nil(vim.tbl_get(el, "opts", "priority"), 1)
+        local inherit = vim.tbl_get(el, "opts", "inherit")
         for _, v in pairs(el.val) do
             if inherit then
                 if v.opts then
-                    local vpriority = if_nil(vim.tbl_get(v, 'opts', 'priority'), 0)
+                    local vpriority = if_nil(vim.tbl_get(v, "opts", "priority"), 0)
                     if priority > vpriority then
                         v.opts = vim.tbl_extend("force", v.opts, inherit)
                     end
@@ -367,7 +365,14 @@ local function layout(conf, state)
     end
     vim.api.nvim_buf_set_lines(state.buffer, 0, -1, false, text)
     for _, hl_line in pairs(hl) do
-        vim.api.nvim_buf_add_highlight(hl_line[1], hl_line[2], hl_line[3], hl_line[4], math.max(hl_line[5], 0), hl_line[6])
+        vim.api.nvim_buf_add_highlight(
+            hl_line[1],
+            hl_line[2],
+            hl_line[3],
+            hl_line[4],
+            math.max(hl_line[5], 0),
+            hl_line[6]
+        )
     end
 end
 
@@ -437,7 +442,8 @@ local function closest_cursor_jump(cursor, cursors, prev_cursor)
             end
         end
     end
-    if not min -- top or bottom
+    if
+        not min -- top or bottom
     then
         if direction then
             return 1, cursors[1]
@@ -571,7 +577,9 @@ end
 
 function alpha.draw(conf, state)
     -- TODO: figure out why this can happen
-    if state.window == nil then return end
+    if state.window == nil then
+        return
+    end
 
     cursor_jumps = {}
     cursor_jumps_press = {}
@@ -596,10 +604,10 @@ end
 
 function alpha.move_cursor(window)
     if #cursor_jumps ~= 0 then
-            local cursor = vim.api.nvim_win_get_cursor(window)
-            local closest_ix, closest_pt = closest_cursor_jump(cursor, cursor_jumps, cursor_jumps[cursor_ix])
-            cursor_ix = closest_ix
-            vim.api.nvim_win_set_cursor(window, closest_pt)
+        local cursor = vim.api.nvim_win_get_cursor(window)
+        local closest_ix, closest_pt = closest_cursor_jump(cursor, cursor_jumps, cursor_jumps[cursor_ix])
+        cursor_ix = closest_ix
+        vim.api.nvim_win_set_cursor(window, closest_pt)
     end
 end
 
@@ -607,7 +615,9 @@ function alpha.redraw(conf, state)
     if (conf == nil) and (state == nil) then
         local buffer = vim.api.nvim_get_current_buf()
         local alpha_prime = vim.tbl_get(alpha_state, buffer) or head(alpha_state)
-        if alpha_prime == nil then return end
+        if alpha_prime == nil then
+            return
+        end
         conf = alpha.default_config
         state = alpha_prime
     end
@@ -639,7 +649,7 @@ function alpha.start(on_vimenter, conf)
             vim.api.nvim_win_set_buf(window, buffer)
         else
             ---@diagnostic disable-next-line: param-type-mismatch
-            if not pcall(vim.cmd, 'e #') then
+            if not pcall(vim.cmd, "e #") then
                 buffer = vim.api.nvim_get_current_buf()
                 vim.api.nvim_buf_delete(buffer, {})
             end
@@ -662,15 +672,10 @@ function alpha.start(on_vimenter, conf)
         open = false,
     }
 
-<<<<<<< HEAD
     alpha_state[buffer] = state
-=======
-    vim.keymap.set("n", "<CR>", function() alpha.press() end, { noremap = false, silent = true, buffer = state.buffer })
-=======
->>>>>>> d9019bcaf736e8e713f02e00b9a5ab9158fe9769
-
-    vim.keymap.set("n", "<CR>", function() alpha.press() end, { noremap = false, silent = true, buffer = state.buffer })
-    vim.keymap.set("n", "<M-CR>", function() alpha.queue_press(state) end, { noremap = false, silent = true, buffer = state.buffer })
+    vim.keymap.set("n", "<CR>", function()
+        alpha.press()
+    end, { noremap = false, silent = true, buffer = state.buffer })
 
     enable_alpha(conf, state)
 
@@ -730,9 +735,7 @@ function alpha.handle_window(x)
     if alpha_instance then
         local wins = vim.tbl_filter(function(win)
             return (vim.api.nvim_win_get_buf(win) == x.buf) and (win ~= current_win)
-        end
-            , vim.api.nvim_list_wins()
-        )
+        end, vim.api.nvim_list_wins())
         alpha_instance.window = wins[1]
     end
 end
