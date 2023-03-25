@@ -666,7 +666,8 @@ function alpha.start(on_vimenter, conf)
     alpha_state[buffer] = state
 =======
     vim.keymap.set("n", "<CR>", function() alpha.press() end, { noremap = false, silent = true, buffer = state.buffer })
->>>>>>> d9019bc (Remove queue_press mapping)
+=======
+>>>>>>> d9019bcaf736e8e713f02e00b9a5ab9158fe9769
 
     vim.keymap.set("n", "<CR>", function() alpha.press() end, { noremap = false, silent = true, buffer = state.buffer })
     vim.keymap.set("n", "<M-CR>", function() alpha.queue_press(state) end, { noremap = false, silent = true, buffer = state.buffer })
